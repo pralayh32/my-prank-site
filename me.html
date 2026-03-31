@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Something Special For You ❤️</title>
+    <!-- Google Fonts for a romantic look -->
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Romantic background with hearts */
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #ffe0ec 0%, #f9c6d1 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Roboto', sans-serif;
+            overflow-x: hidden;
+        }
+        .container {
+            background: rgba(255,255,255,0.85);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            padding: 2.5rem 2rem 2rem 2rem;
+            max-width: 350px;
+            width: 90vw;
+            text-align: center;
+            position: relative;
+        }
+        .hearts {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2.5rem;
+            color: #ff6f91;
+            pointer-events: none;
+            user-select: none;
+        }
+        .romantic-message {
+            font-family: 'Pacifico', cursive;
+            font-size: 1.5rem;
+            color: #d72660;
+            margin-bottom: 1.5rem;
+        }
+        .show-message-btn {
+            background: #ff6f91;
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            padding: 0.8rem 2rem;
+            font-size: 1.1rem;
+            font-family: 'Roboto', sans-serif;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-bottom: 1rem;
+        }
+        .show-message-btn:hover {
+            background: #d72660;
+        }
+        .loading {
+            display: none;
+            margin: 1.5rem 0;
+        }
+        .dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            margin: 0 2px;
+            background: #ff6f91;
+            border-radius: 50%;
+            animation: bounce 1s infinite alternate;
+        }
+        .dot:nth-child(2) { animation-delay: 0.2s; }
+        .dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes bounce {
+            to { transform: translateY(-10px); }
+        }
+        .prank {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .prank-message {
+            font-size: 1.5rem;
+            color: #ff9800;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            animation: shake 0.5s infinite alternate;
+        }
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+        .typing {
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 1rem;
+            min-height: 1.5em;
+        }
+        .confetti {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none;
+            z-index: 999;
+        }
+        .try-again-btn {
+            background: #ff9800;
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            padding: 0.7rem 1.5rem;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: background 0.2s;
+        }
+        .try-again-btn:hover {
+            background: #d72660;
+        }
+        /* Responsive design */
+        @media (max-width: 500px) {
+            .container {
+                padding: 1.2rem 0.5rem 1.5rem 0.5rem;
+                max-width: 98vw;
+            }
+            .romantic-message, .prank-message {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Confetti canvas for prank -->
+    <canvas class="confetti"></canvas>
+    <div class="container">
+        <div class="hearts">❤️💕💖</div>
+        <div class="romantic-message">I have something special to tell you ❤️</div>
+        <button class="show-message-btn">Click to see my message</button>
+        <!-- Fake question step -->
+        <div class="question-step" style="display:none; flex-direction:column; align-items:center;">
+            <div class="question-text" style="font-size:1.2rem; color:#d72660; margin-bottom:1.2rem;">Do you love me? 🥺❤️</div>
+            <div style="display:flex; gap:1.2rem; justify-content:center;">
+                <button class="yes-btn" style="background:#ff6f91; color:#fff; border:none; border-radius:20px; padding:0.7rem 1.5rem; font-size:1rem; cursor:pointer;">YES</button>
+                <button class="no-btn" style="background:#ffd166; color:#d72660; border:none; border-radius:20px; padding:0.7rem 1.5rem; font-size:1rem; cursor:pointer; position:relative;">NO</button>
+            </div>
+        </div>
+        <div class="loading">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        </div>
+        <div class="prank">
+            <div class="typing"></div>
+            <div class="prank-message"></div>
+            <button class="try-again-btn">Try again</button>
+        </div>
+    </div>
+    <!-- Optional: Romantic background music -->
+    <audio id="romantic-music" src="https://cdn.pixabay.com/audio/2022/10/16/audio_12b6b2b1b2.mp3" loop></audio>
+    <!-- Optional: Funny sound for prank -->
+    <audio id="prank-sound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_115b9b1b1b.mp3"></audio>
+    <script>
+    // Get elements
+    const showBtn = document.querySelector('.show-message-btn');
+    const loading = document.querySelector('.loading');
+    const prank = document.querySelector('.prank');
+    const prankMsg = document.querySelector('.prank-message');
+    const typing = document.querySelector('.typing');
+    const tryAgainBtn = document.querySelector('.try-again-btn');
+    const container = document.querySelector('.container');
+    const romanticMusic = document.getElementById('romantic-music');
+    const prankSound = document.getElementById('prank-sound');
+    const confettiCanvas = document.querySelector('.confetti');
+    // New: Question step elements
+    const questionStep = document.querySelector('.question-step');
+    const yesBtn = document.querySelector('.yes-btn');
+    const noBtn = document.querySelector('.no-btn');
+
+    // Play romantic music on load
+    window.addEventListener('DOMContentLoaded', () => {
+        romanticMusic.volume = 0.3;
+        romanticMusic.play().catch(()=>{}); // Autoplay may be blocked
+    });
+
+    // Show question step after clicking main button
+    showBtn.addEventListener('click', () => {
+        showBtn.style.display = 'none';
+        questionStep.style.display = 'flex';
+    });
+
+    // YES button: proceed to loading and prank
+    yesBtn.addEventListener('click', () => {
+        questionStep.style.display = 'none';
+        loading.style.display = 'block';
+        // Fade out romantic music
+        fadeOutAudio(romanticMusic, 2000);
+        setTimeout(() => {
+            loading.style.display = 'none';
+            showPrank();
+        }, 2200 + Math.random()*800); // 2.2-3s
+    });
+
+    // NO button: run away from cursor
+    noBtn.addEventListener('mouseenter', moveNoBtn);
+    noBtn.addEventListener('mousemove', moveNoBtn);
+    function moveNoBtn(e) {
+        // Get container bounds
+        const parent = noBtn.parentElement;
+        const parentRect = parent.getBoundingClientRect();
+        const btnRect = noBtn.getBoundingClientRect();
+        // Pick a random position within parent, but keep button inside
+        const maxLeft = parentRect.width - btnRect.width;
+        const maxTop = parentRect.height - btnRect.height;
+        let left = Math.random() * maxLeft;
+        let top = Math.random() * maxTop;
+        // Animate move
+        noBtn.style.position = 'relative';
+        noBtn.style.left = left + 'px';
+        noBtn.style.top = top + 'px';
+    }
+
+    // Try again button resets everything
+    tryAgainBtn.addEventListener('click', () => {
+        prank.style.display = 'none';
+        showBtn.style.display = 'inline-block';
+        prankMsg.textContent = '';
+        typing.textContent = '';
+        container.style.background = 'rgba(255,255,255,0.85)';
+        // Stop confetti
+        stopConfetti();
+        // Restart romantic music
+        romanticMusic.currentTime = 0;
+        romanticMusic.play().catch(()=>{});
+        // Reset question step button position
+        noBtn.style.left = '0px';
+        noBtn.style.top = '0px';
+        noBtn.style.position = 'relative';
+    });
+
+    // Show the prank message with typing effect and confetti
+    function showPrank() {
+        prank.style.display = 'flex';
+        typing.textContent = '';
+        prankMsg.textContent = '';
+        // Play funny sound
+        prankSound.currentTime = 0;
+        prankSound.play().catch(()=>{});
+        // Fake typing effect
+        const prankText = 'APRIL FOOL 😂! You really thought it was something serious?';
+        let i = 0;
+        function type() {
+            if (i < prankText.length) {
+                typing.textContent += prankText[i];
+                i++;
+                setTimeout(type, 35 + Math.random()*40);
+            } else {
+                typing.textContent = '';
+                prankMsg.textContent = prankText;
+                // Start confetti
+                startConfetti();
+            }
+        }
+        type();
+    }
+
+    // Fade out audio helper
+    function fadeOutAudio(audio, duration) {
+        if (!audio) return;
+        let step = audio.volume / (duration/50);
+        let fade = setInterval(() => {
+            if (audio.volume > step) {
+                audio.volume -= step;
+            } else {
+                audio.volume = 0;
+                audio.pause();
+                clearInterval(fade);
+            }
+        }, 50);
+    }
+
+    // Simple confetti animation
+    let confettiActive = false;
+    let confettiParticles = [];
+    function startConfetti() {
+        confettiActive = true;
+        confettiParticles = [];
+        resizeConfetti();
+        for (let i = 0; i < 60; i++) {
+            confettiParticles.push({
+                x: Math.random() * confettiCanvas.width,
+                y: Math.random() * -confettiCanvas.height,
+                r: 6 + Math.random()*8,
+                d: 2 + Math.random()*2,
+                color: randomColor(),
+                tilt: Math.random()*10-5
+            });
+        }
+        confettiCanvas.style.display = 'block';
+        requestAnimationFrame(drawConfetti);
+    }
+    function stopConfetti() {
+        confettiActive = false;
+        confettiCanvas.style.display = 'none';
+    }
+    function drawConfetti() {
+        if (!confettiActive) return;
+        const ctx = confettiCanvas.getContext('2d');
+        ctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
+        for (let p of confettiParticles) {
+            ctx.beginPath();
+            ctx.ellipse(p.x, p.y, p.r, p.r/2, p.tilt, 0, 2*Math.PI);
+            ctx.fillStyle = p.color;
+            ctx.fill();
+            p.y += p.d;
+            p.x += Math.sin(p.y/30)*2;
+            p.tilt += 0.02;
+            if (p.y > confettiCanvas.height) {
+                p.y = -10;
+                p.x = Math.random() * confettiCanvas.width;
+            }
+        }
+        requestAnimationFrame(drawConfetti);
+    }
+    function randomColor() {
+        const colors = ['#ff6f91','#f9c6d1','#ffd166','#06d6a0','#118ab2','#ef476f','#ff9800'];
+        return colors[Math.floor(Math.random()*colors.length)];
+    }
+    function resizeConfetti() {
+        confettiCanvas.width = window.innerWidth;
+        confettiCanvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeConfetti);
+    // Initial confetti size
+    resizeConfetti();
+    </script>
+</body>
+</html>
+
+
+
+
+
+
